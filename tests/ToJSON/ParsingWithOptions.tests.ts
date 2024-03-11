@@ -76,6 +76,7 @@ describe('Parsing Model', () => {
   it('parse file', () => {
     const options = new ParsingOptions();
     const config = options.GetConfig();
+    const conversionOptions = options.GetConversionOptions();
     mock({
       'ABC.ged': `
                     0 @I1@ INDI
@@ -83,6 +84,7 @@ describe('Parsing Model', () => {
           `,
     });
     options.SetConfig(config);
+    options.SetConversionOptions(conversionOptions);
     options.SetFilePath('ABC.ged');
     const parsing = new Parsing(options);
     let result = {};
@@ -111,6 +113,7 @@ describe('Parsing Model', () => {
   it('parse file async', async () => {
     const options = new ParsingOptions();
     const config = options.GetConfig();
+    const conversionOptions = options.GetConversionOptions();
     mock({
       'ABC.ged': `
                     0 @I1@ INDI
@@ -118,6 +121,7 @@ describe('Parsing Model', () => {
           `,
     });
     options.SetConfig(config);
+    options.SetConversionOptions(conversionOptions);
     options.SetFilePath('ABC.ged');
     const parsing = new Parsing(options);
     const result = await parsing.ParseFileAsync();

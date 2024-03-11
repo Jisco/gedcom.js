@@ -9,6 +9,9 @@ it('IsValidLine', () => {
   expect(IsValidLine('1 TAG' + ' '.repeat(250))).to.be.true;
   expect(IsValidLine('1 TAG' + ' '.repeat(251))).to.be.false;
 
+  // ignore max-line-length
+  expect(IsValidLine('1 TAG' + '_'.repeat(251), true)).to.be.true;
+
   // first char needs to be a number
   expect(IsValidLine('Q Tag')).to.be.false;
   expect(IsValidLine('A Tag')).to.be.false;

@@ -185,4 +185,57 @@ describe('Features', () => {
       },
     });
   });
+
+  it('Ignores long lines when configured to do so', () => {
+    let testData = `
+    0 @1@ INDI
+    1 NOTE ${'abc '.repeat(100)}
+    0 TRLR`;
+
+    let options = `
+        Definition:
+          - Tag: INDI
+            CollectAs: Persons
+            Properties:
+              - Tag: NOTE
+                Property: Note
+        `;
+
+    let conversionOptions = `
+        Options:
+          - IgnoreMaxLineLength: true
+        `;
+
+    expect(ParseText(testData, options, undefined, conversionOptions).Object).to.deep.equal({
+      Persons: {
+        Note: 'abc '.repeat(100).trim(),
+      },
+    });
+  });
+
+  it('Ignores empty conversion options', () => {
+    let testData = `
+    0 @1@ INDI
+    1 NOTE abc
+    0 TRLR`;
+
+    let options = `
+        Definition:
+          - Tag: INDI
+            CollectAs: Persons
+            Properties:
+              - Tag: NOTE
+                Property: Note
+        `;
+
+    let conversionOptions = `
+        Options:
+        `;
+
+    expect(ParseText(testData, options, undefined, conversionOptions).Object).to.deep.equal({
+      Persons: {
+        Note: 'abc',
+      },
+    });
+  });
 });

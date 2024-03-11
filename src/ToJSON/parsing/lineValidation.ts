@@ -7,14 +7,14 @@ import { IsNumber } from '../../common';
  * @param line - The line text
  * @returns true if the line is valid
  */
-export function IsValidLine(line: string): Boolean {
+export function IsValidLine(line: string, ignoreMaxLineLength?: boolean): Boolean {
   // empty string
   if (isEmpty(line)) {
     return false;
   }
 
   // max length is 255
-  if (line.length > 255) {
+  if (!ignoreMaxLineLength && line.length > 255) {
     return false;
   }
 

@@ -31,10 +31,27 @@ describe('Parsing Options', () => {
     expect(options.GetConfig()).to.equal('ABC');
   });
 
+  it('Conversion Options File', () => {
+    const options = new ParsingOptions();
+
+    mock({
+      'ABC.yaml': 'ABC',
+    });
+
+    options.SetConversionOptionsFile('ABC.yaml');
+    expect(options.GetConversionOptions()).to.equal('ABC');
+  });
+
   it('Config', () => {
     const options = new ParsingOptions();
     options.SetConfig('ABC');
     expect(options.GetConfig()).to.equal('ABC');
+  });
+
+  it('Conversion Options', () => {
+    const options = new ParsingOptions();
+    options.SetConversionOptions('ABC');
+    expect(options.GetConversionOptions()).to.equal('ABC');
   });
 
   it('Progress', () => {

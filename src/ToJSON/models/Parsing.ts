@@ -18,7 +18,12 @@ export default class Parsing {
       return new ParsingResult({});
     }
 
-    return ParseText(this.options.GetText(), this.options.GetConfig(), this.options.GetProgressFunction());
+    return ParseText(
+      this.options.GetText(),
+      this.options.GetConfig(),
+      this.options.GetProgressFunction(),
+      this.options.GetConversionOptions()
+    );
   }
 
   ParseTextAsync(): Promise<ParsingResult> {
@@ -29,7 +34,9 @@ export default class Parsing {
     }
 
     return new Promise<ParsingResult>((resolve, reject) => {
-      resolve(ParseText(this.options.GetText(), this.options.GetConfig(), this.options.GetProgressFunction()));
+      resolve(
+        ParseText(this.options.GetText(), this.options.GetConfig(), this.options.GetProgressFunction(), this.options.GetConversionOptions())
+      );
     });
   }
 
@@ -39,7 +46,14 @@ export default class Parsing {
       return;
     }
 
-    ParseFile(filePath, this.options.GetConfig(), doneCallback, errorCallback, this.options.GetProgressFunction());
+    ParseFile(
+      filePath,
+      this.options.GetConfig(),
+      doneCallback,
+      errorCallback,
+      this.options.GetProgressFunction(),
+      this.options.GetConversionOptions()
+    );
   }
 
   ParseFileAsync(): Promise<ParsingResult> {

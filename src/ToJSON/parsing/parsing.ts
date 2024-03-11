@@ -21,9 +21,15 @@ let stats = new Statistics();
  * @param text - The text
  * @param parsingOptions - The parsing options
  * @param invokeProgressFunction - Set function that is called before each line, to show progress in some way
+ * @param conversionOptions - The conversion options
  * @returns An object which includes the parsed object and parsing statistics
  */
-export function ParseText(text?: string, parsingOptions?: string, invokeProgressFunction?: (linesCount: number, actualLine: number) => void): ParsingResult {
+export function ParseText(
+  text?: string,
+  parsingOptions?: string,
+  invokeProgressFunction?: (linesCount: number, actualLine: number) => void,
+  conversionOptions?: string
+): ParsingResult {
   stats = new Statistics();
 
   if (!text || !parsingOptions) {
@@ -36,10 +42,23 @@ export function ParseText(text?: string, parsingOptions?: string, invokeProgress
   let lineNumber = 1;
   let lines = split(text, '\n');
   let yamlOptions: string | object | undefined = {};
+  let conversionYamlOptions: string | object | undefined = {};
+
+  let ignoreMaxLineLength = false;
 
   try {
     yamlOptions = yaml.safeLoad(parsingOptions);
     SetParsingOptions(yamlOptions);
+
+    conversionYamlOptions = yaml.safeLoad(conversionOptions ?? '');
+
+    if (conversionYamlOptions) {
+      const yamlConfig = JSON.parse(JSON.stringify(conversionYamlOptions)).Options;
+      if (yamlConfig) {
+        const configOptions: any = Object.assign({}, ...yamlConfig);
+        ignoreMaxLineLength = configOptions.IgnoreMaxLineLength.toString() === 'true';
+      }
+    }
   } catch (e) {
     ResetProcessing();
     return new ParsingResult({});
@@ -58,7 +77,7 @@ export function ParseText(text?: string, parsingOptions?: string, invokeProgress
       invokeProgressFunction(lines.length, index);
     }
 
-    ProcessNewLine(lastLevel, lineNumber, line, nextLine);
+    ProcessNewLine(lastLevel, lineNumber, line, nextLine, ignoreMaxLineLength);
   });
 
   let result = GetResult();
@@ -74,6 +93,7 @@ export function ParseText(text?: string, parsingOptions?: string, invokeProgress
  * @param doneCallback - Returns the resulting object when file is readed completly
  * @param errorCallback - Returns file reading errors
  * @param invokeProgressFunction - Set function that is called before each line, to show progress in some way
+ * @param conversionOptions - The conversion options
  * @returns An object which includes the parsed object and parsing statistics
  */
 
@@ -83,11 +103,12 @@ export function ParseFile(
   parsingOptions: string,
   doneCallback: (result: ParsingResult) => void,
   errorCallback: any,
-  invokeProgressFunction?: ((linesCount: number, actualLine: number) => void) | undefined
+  invokeProgressFunction?: ((linesCount: number, actualLine: number) => void) | undefined,
+  conversionOptions?: string
 ) {
   // if no progress should be shown, it is not necessary to get the line count of the file at first
   if (!invokeProgressFunction) {
-    ExecuteParseFile(path, parsingOptions, doneCallback, errorCallback, 0);
+    ExecuteParseFile(path, parsingOptions, doneCallback, errorCallback, 0, undefined, conversionOptions);
     return;
   }
 
@@ -101,7 +122,7 @@ export function ParseFile(
   });
 
   linesCountLr.on('end', function () {
-    ExecuteParseFile(path, parsingOptions, doneCallback, errorCallback, linesCount, invokeProgressFunction);
+    ExecuteParseFile(path, parsingOptions, doneCallback, errorCallback, linesCount, invokeProgressFunction, conversionOptions);
   });
 }
 
@@ -112,16 +133,30 @@ function ExecuteParseFile(
   doneCallback: (result: ParsingResult) => void,
   errorCallback: any,
   linesCount: number,
-  invokeProgressFunction?: ((linesCount: number, actualLine: number) => void) | undefined
+  invokeProgressFunction?: ((linesCount: number, actualLine: number) => void) | undefined,
+  conversionOptions?: string
 ) {
   let lr = new LineByLineReader(path);
   let lastLevel = 0;
   let lineNumber = 1;
   let yamlOptions: string | object | undefined = {};
+  let conversionYamlOptions: string | object | undefined = {};
+
+  let ignoreMaxLineLength = false;
 
   try {
     yamlOptions = yaml.safeLoad(parsingOptions);
     SetParsingOptions(yamlOptions);
+
+    conversionYamlOptions = yaml.safeLoad(conversionOptions ?? '');
+
+    if (conversionYamlOptions) {
+      const yamlConfig = JSON.parse(JSON.stringify(conversionYamlOptions)).Options;
+      if (yamlConfig) {
+        const configOptions: any = Object.assign({}, ...yamlConfig);
+        ignoreMaxLineLength = configOptions.IgnoreMaxLineLength.toString() === 'true';
+      }
+    }
   } catch (e) {
     errorCallback(e);
     doneCallback(new ParsingResult({}));
@@ -151,7 +186,7 @@ function ExecuteParseFile(
 
   lr.on('line', function (line: any) {
     lr.pause();
-    ProcessNewLine(lastLevel, lineNumber, line, nextLine);
+    ProcessNewLine(lastLevel, lineNumber, line, nextLine, ignoreMaxLineLength);
   });
 
   lr.on('end', function () {
@@ -169,12 +204,13 @@ function ExecuteParseFile(
  * @param lineNumber line number
  * @param line line content
  * @param nextLine function to invoke the processing of the next line
+ * @param ignoreMaxLineLength - Don't fail validation if the line is too long
  * @internal
  */
-export function ProcessNewLine(lastLevel: number, lineNumber: number, line: string, nextLine: Function) {
+export function ProcessNewLine(lastLevel: number, lineNumber: number, line: string, nextLine: Function, ignoreMaxLineLength?: boolean) {
   let actualLine = trimStart(line);
 
-  if (!IsValidLine(actualLine)) {
+  if (!IsValidLine(actualLine, ignoreMaxLineLength)) {
     stats.IncorrectLines.push(new StatisticLine(lineNumber, actualLine));
     nextLine();
     return stats;
