@@ -20,6 +20,7 @@ import first from 'lodash/first';
 
 import objectPath from 'object-path';
 
+import ParsedLine from '../models/ParsedLine';
 import ParsingObject from '../models/ParsingObject';
 import TagDefinition from '../models/TagDefinition';
 import ConvertToString from '../models/converter/ConvertToString';
@@ -30,6 +31,11 @@ import fclone from 'fclone';
 import { AddStartWith } from './manipulateValues';
 
 export function CreateResult(objects: ParsingObject[]) {
+  for (const obj of objects.filter((x) => x.Line.NoValue)) {
+    obj.Line.Value = '';
+    obj.Object = { [obj.Definition.Property ?? 'Value']: '' };
+  }
+
   // collect all main objects
   let mainObjectIndexes = GetMainObjectIndexes(objects);
   let mainObjects: MainObject[] = [];
@@ -62,14 +68,14 @@ export function CreateMainObject(objects: ParsingObject[]): MainObject {
     let mergeObject = last(objectsToSearch);
 
     let val = obj.Line.Value;
-    val = AddStartWith(obj.Definition.StartWith, val);
+    val = AddStartWith(obj.Definition.StartWith, obj.Line);
     if (!mergeObject) {
       mergeValue = val;
       return;
     }
 
     if (!isEmpty(obj.Object) && (isArray(obj.Object) || isObject(obj.Object))) {
-      SetOrCreateArray(mergeObject.Object, split(obj.Definition.Path, '.'), obj.Definition, obj.Object);
+      SetOrCreateArray(mergeObject.Object, split(obj.Definition.Path, '.'), obj.Definition, obj.Object, obj.Line);
       remove(objects, (x) => isEqual(x, obj));
       return;
     }
@@ -147,7 +153,7 @@ export function CreateMainObject(objects: ParsingObject[]): MainObject {
     let mergeObject = findLast(objectsToSearch, (x) => x.Definition.Tag === obj.Definition.MergeWithLast);
 
     if (mergeObject) {
-      SetOrCreateArray(mergeObject.Object, split(obj.Definition.Path, '.'), obj.Definition, obj.Object);
+      SetOrCreateArray(mergeObject.Object, split(obj.Definition.Path, '.'), obj.Definition, obj.Object, obj.Line);
       remove(objects, (x) => isEqual(x, obj));
     }
   });
@@ -160,7 +166,7 @@ export function CreateMainObject(objects: ParsingObject[]): MainObject {
     let mergeObject = find(objectsToSearch, (x) => x.Definition.Tag === obj.Definition.MergeWithNext);
 
     if (mergeObject) {
-      SetOrCreateArray(mergeObject.Object, split(obj.Definition.Path, '.'), obj.Definition, obj.Object);
+      SetOrCreateArray(mergeObject.Object, split(obj.Definition.Path, '.'), obj.Definition, obj.Object, obj.Line);
       remove(objects, (x) => isEqual(x, obj));
     }
   });
@@ -204,7 +210,7 @@ export function CreateMainObject(objects: ParsingObject[]): MainObject {
     });
 
     remove(obj.PropertyPath, (x) => isEmpty(x));
-    SetOrCreateArray(result, obj.PropertyPath, obj.Definition, obj.Object);
+    SetOrCreateArray(result, obj.PropertyPath, obj.Definition, obj.Object, obj.Line);
   });
 
   return new MainObject(objects[0], result);
@@ -281,7 +287,7 @@ export function SetObject(mainObject: Object, path: string[], value: Object, def
   objectPath.set(mainObject, path, [oldValue, value]);
 }
 
-export function SetOrCreateArray(obj: any, path: string[], definition: TagDefinition, value: any) {
+export function SetOrCreateArray(obj: any, path: string[], definition: TagDefinition, value: any, line: ParsedLine) {
   // should be a single value -> last wins
   if (definition.IsSingleValue) {
     if (objectPath.has(obj, path)) {
@@ -316,8 +322,12 @@ export function SetOrCreateArray(obj: any, path: string[], definition: TagDefini
   if (definition.ConvertTo instanceof ConvertToString) {
     let newLineCharacter = definition.ConvertTo.NewLineCharacter;
 
-    if (definition.ConvertTo.NewLineIfEmpty && IsEmpty(value)) {
+    if (definition.ConvertTo.NewLineIfEmpty && (IsEmpty(value) || line.NoValue)) {
       value = newLineCharacter;
+    }
+
+    if (!definition.ConvertTo.NewLineIfEmpty && (IsEmpty(value) || line.NoValue)) {
+      return;
     }
 
     // ignore empty value

@@ -256,6 +256,41 @@ describe('Convert To', () => {
       });
     });
 
+    it('With empty newline character', () => {
+      let testData = `
+            0 @N00010@ NOTE
+            1 CONC 1
+            1 CONT
+            1 CONT A
+            1 CONT B
+            1 CONT C
+            1 CONT
+            1 CONT ...
+            0 TRLR`;
+
+      let options = `
+            Definition:
+            - Tag: NOTE
+              CollectAs: Notes
+              Properties:
+              - Tag: CONC
+                Property: Text   
+                Type: String 
+              - Tag: CONT
+                Property: Text
+                ConvertTo:
+                  Type: String
+                  NewLineIfEmpty: true
+                  NewLineCharacter: ""
+            `;
+
+      expect(ParseText(testData, options).Object).to.deep.equal({
+        Notes: {
+          Text: `1ABC...`,
+        },
+      });
+    });
+
     it('Multiproperty', () => {
       let testData = `
             0 @N00010@ NOTE

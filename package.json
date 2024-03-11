@@ -8,6 +8,7 @@
     "clean": "tsc --build ./tsconfig.json --clean",
     "demo:JSON": "ts-node src/console.ts --path 'examples/simpsons.ged'",
     "demoFile:JSON": "ts-node src/console.ts --path 'examples/simpsons.ged' --out 'test.json'",
+    "demoError": "ts-node src/console.ts --path 'examples/singlePerson.ged' --out 'test.json' --showProgress",
     "demoFileWithProgress:JSON": "ts-node src/console.ts --path 'examples/royal92.ged' --out 'test.json' --showProgress",
     "test": "nyc mocha",
     "test:watch": "mocha --watch --watch-files src, tests/**/*.ts",

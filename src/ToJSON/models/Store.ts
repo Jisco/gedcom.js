@@ -67,7 +67,7 @@ export default class Store {
 
     // if no value is set, but the value should start with a specific value -> set the value and remove the property
     if (!(line.ReferenceId || line.Value)) {
-      line.Value = AddStartWith(definition.StartWith, line.Value);
+      line.Value = AddStartWith(definition.StartWith, line);
       definition.StartWith = undefined;
     }
 

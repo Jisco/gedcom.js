@@ -17,6 +17,7 @@ describe('Features', () => {
         CollectAs: Persons
         Properties:
           - Tag: RESI
+            Property: Residence
             Properties:
             - Tag: EMAIL
               Property: EMail
@@ -27,7 +28,16 @@ describe('Features', () => {
 
     expect(ParseText(testData, options).Object).to.deep.equal({
       Persons: {
-        EMail: ['email@test.com', 'anotherEmail@test.com'],
+        Residence: [
+          {
+            EMail: 'email@test.com',
+            Residence: '',
+          },
+          {
+            EMail: 'anotherEmail@test.com',
+            Residence: '',
+          },
+        ],
       },
     });
   });
@@ -47,6 +57,7 @@ describe('Features', () => {
         CollectAs: Persons
         Properties:
           - Tag: RESI
+            Property: Residence
             Properties:
             - Tag: EMAIL
               Property: EMail
@@ -58,7 +69,16 @@ describe('Features', () => {
 
     expect(ParseText(testData, options).Object).to.deep.equal({
       Persons: {
-        EMail: ['mail:email@@test.com', 'mail:anotherEmail@@test.com'],
+        Residence: [
+          {
+            EMail: 'mail:email@@test.com',
+            Residence: '',
+          },
+          {
+            EMail: 'mail:anotherEmail@@test.com',
+            Residence: '',
+          },
+        ],
       },
     });
   });
@@ -141,6 +161,7 @@ describe('Features', () => {
         CollectAs: Persons
         Properties:
           - Tag: RESI
+            Property: Residence
             Properties:
             - Tag: EMAIL
               Property: EMail
@@ -150,7 +171,16 @@ describe('Features', () => {
 
     expect(ParseText(testData, options).Object).to.deep.equal({
       Persons: {
-        EMail: ['email@@test.com', 'anotherEmail@@test.com'],
+        Residence: [
+          {
+            EMail: 'email@@test.com',
+            Residence: '',
+          },
+          {
+            EMail: 'anotherEmail@@test.com',
+            Residence: '',
+          },
+        ],
       },
     });
   });

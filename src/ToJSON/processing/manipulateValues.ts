@@ -24,7 +24,7 @@ export function ManipulateValue(definition: TagDefinition, line: ParsedLine) {
     return value;
   }
 
-  value = AddStartWith(definition.StartWith, value);
+  value = AddStartWith(definition.StartWith, line);
 
   if (definition.Replace) {
     let pattern = definition.Replace.Value;
@@ -58,20 +58,24 @@ export function ManipulateValue(definition: TagDefinition, line: ParsedLine) {
   return value;
 }
 
-export function AddStartWith(startWith: string | undefined, value: string | undefined): string {
+export function AddStartWith(startWith: string | undefined, line: ParsedLine): string {
   if (!startWith) {
-    return value ?? '';
+    if (!line.Value || line.Value === '') {
+      line.NoValue = true;
+      return '-';
+    }
+    return line.Value;
   }
 
   if (startWith === '\\n') {
     startWith = '\n';
   }
 
-  if (!value) {
+  if (!line.Value) {
     return startWith;
   }
 
-  return `${startWith}${value}`;
+  return `${startWith}${line.Value}`;
 }
 
 function ConvertStringToArray(convertOptions: ConvertToArray, value: string) {

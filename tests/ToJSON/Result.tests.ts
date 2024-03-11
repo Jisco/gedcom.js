@@ -7,7 +7,7 @@ import { CreateMainObject, GetMainObjectIndexes, SetObject, SetOrCreateArray } f
 describe('Set property in object', () => {
   it('Property dont hast path', () => {
     let result = {};
-    SetOrCreateArray(result, ['Prop', 'Prop2'], new TagDefinition({}), 'A');
+    SetOrCreateArray(result, ['Prop', 'Prop2'], new TagDefinition({}), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: {
@@ -18,7 +18,7 @@ describe('Set property in object', () => {
 
   it('Property is String', () => {
     let result = { Prop: 'Text' };
-    SetOrCreateArray(result, ['Prop', 'Prop2'], new TagDefinition({}), 'A');
+    SetOrCreateArray(result, ['Prop', 'Prop2'], new TagDefinition({}), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: {
@@ -30,7 +30,7 @@ describe('Set property in object', () => {
 
   it('Set property', () => {
     let result = {};
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({}), 'A');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({}), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'A',
@@ -41,7 +41,7 @@ describe('Set property in object', () => {
     let result = {
       Prop: 'B',
     };
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({ IsSingleValue: true }), 'A');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({ IsSingleValue: true }), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'A',
@@ -50,7 +50,7 @@ describe('Set property in object', () => {
 
   it('SingleValue set value', () => {
     let result = {};
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({ IsSingleValue: true }), 'A');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({ IsSingleValue: true }), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'A',
@@ -61,7 +61,7 @@ describe('Set property in object', () => {
     let result = {
       Prop: 'B',
     };
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({}), 'A');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({}), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: ['B', 'A'],
@@ -72,7 +72,7 @@ describe('Set property in object', () => {
     let result = {
       Prop: 'B',
     };
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({}), '');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({}), '', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'B',
@@ -83,7 +83,7 @@ describe('Set property in object', () => {
     let result = {
       Prop: 'B',
     };
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({ ConvertTo: { Type: 'String', NewLineIfEmpty: true } }), '');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({ ConvertTo: { Type: 'String', NewLineIfEmpty: true } }), '', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'B\n',
@@ -94,7 +94,7 @@ describe('Set property in object', () => {
     let result = {
       Prop: 'B',
     };
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({ Type: 'String' }), 'A');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({ Type: 'String' }), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'BA',
@@ -105,8 +105,8 @@ describe('Set property in object', () => {
     let result = {
       Prop: 'B',
     };
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({ ConvertTo: { Type: 'String', NewLineIfEmpty: true, NewLineCharacter: '#' } }), '');
-    SetOrCreateArray(result, ['Prop'], new TagDefinition({ ConvertTo: { Type: 'String' } }), 'A');
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({ ConvertTo: { Type: 'String', NewLineIfEmpty: true, NewLineCharacter: '#' } }), '', new ParsedLine(0, 0, 'TAG'));
+    SetOrCreateArray(result, ['Prop'], new TagDefinition({ ConvertTo: { Type: 'String' } }), 'A', new ParsedLine(0, 0, 'TAG'));
 
     expect(result).to.deep.equal({
       Prop: 'B#A',
@@ -528,9 +528,9 @@ describe('Create main object', () => {
 
   describe('MergeWithLast', () => {
     it('Without specific name C in empty object', () => {
-      let firstObject = new ParsingObject(new TagDefinition({ Tag: 'A' }), new ParsedLine(0, 0, '', undefined, undefined), ['Prop']);
-      let subObject = new ParsingObject(new TagDefinition({ Tag: 'B' }), new ParsedLine(0, 0, '', undefined, undefined), ['Prop', 'A']);
-      let subObject2 = new ParsingObject(new TagDefinition({ Tag: 'C' }), new ParsedLine(0, 0, '', undefined, undefined), ['Prop', 'A']);
+      let firstObject = new ParsingObject(new TagDefinition({ Tag: 'A' }), new ParsedLine(0, 0, '', undefined, undefined, true), ['Prop']);
+      let subObject = new ParsingObject(new TagDefinition({ Tag: 'B' }), new ParsedLine(0, 0, '', undefined, undefined, true), ['Prop', 'A']);
+      let subObject2 = new ParsingObject(new TagDefinition({ Tag: 'C' }), new ParsedLine(0, 0, '', undefined, undefined, true), ['Prop', 'A']);
 
       firstObject.Object = { Id: 'A' };
       subObject.Object = { Id: 'B' };
@@ -538,7 +538,7 @@ describe('Create main object', () => {
 
       let mergeWithLast = new ParsingObject(
         new TagDefinition({ Tag: 'D', MergeWithLast: true, Property: 'Merge' }),
-        new ParsedLine(0, 0, '', undefined, undefined),
+        new ParsedLine(0, 0, '', undefined, undefined, true),
         []
       );
       mergeWithLast.Object = {};
@@ -552,6 +552,7 @@ describe('Create main object', () => {
             },
             {
               Id: 'C',
+              Text: '-',
             },
           ],
           Id: 'A',

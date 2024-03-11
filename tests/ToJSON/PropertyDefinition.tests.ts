@@ -27,6 +27,7 @@ describe('Definitions', () => {
       Individuals: {
         Id: '@111@',
         Changed: {
+          Changed: '',
           Date: {
             HasDay: true,
             HasMonth: true,
@@ -68,6 +69,7 @@ describe('Definitions', () => {
       Individuals: {
         Id: '@111@',
         Changed: {
+          Changed: '',
           ChangedDate: {
             HasDay: true,
             HasMonth: true,
@@ -113,6 +115,7 @@ describe('Definitions', () => {
       Individuals: {
         Id: '@111@',
         Changed: {
+          Changed: '',
           ChangedDate: {
             HasDay: true,
             HasMonth: true,
@@ -161,6 +164,7 @@ describe('Definitions', () => {
       Individuals: {
         Id: '@111@',
         Changed: {
+          Changed: '',
           ChangedDate: {
             HasDay: true,
             HasMonth: true,

@@ -1,0 +1,17 @@
+﻿0 HEAD
+1 SOUR TEST
+0 @I1@ INDI
+1 NAME John /Doe/
+2 GIVN John
+2 SURN Doe
+1 MARR
+2 DATE 7 Jul 1912
+2 PLAC London, England
+1 DIV
+2 DATE 8 Aug 1913
+1 MARR
+2 DATE 9 Sep 1915
+2 PLAC Paris, France
+1 DIV
+2 DATE 10 Sep 1916
+0 TRLR

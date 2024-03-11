@@ -8,6 +8,7 @@ it('ParseLine', () => {
     ReferenceId: '',
     Tag: 'Tag',
     Value: '',
+    NoValue: false,
   });
 
   expect(ParseLine('2 @III@ INDI', 1, 1)).to.deep.equal({
@@ -16,6 +17,7 @@ it('ParseLine', () => {
     ReferenceId: '@III@',
     Tag: 'INDI',
     Value: '',
+    NoValue: false,
   });
 
   expect(ParseLine('2 INDI VALUE', 1, 1)).to.deep.equal({
@@ -24,6 +26,7 @@ it('ParseLine', () => {
     ReferenceId: '',
     Tag: 'INDI',
     Value: 'VALUE',
+    NoValue: false,
   });
 
   // level jump, eg here from 1 to 3
@@ -36,6 +39,7 @@ it('ParseLine', () => {
     ReferenceId: `@${'I'.repeat(21)}@`,
     Tag: 'INDI',
     Value: '',
+    NoValue: false,
   });
   expect(ParseLine(`2 @${'I'.repeat(22)}@ INDI`, 1, 1)).to.be.undefined;
 
@@ -46,6 +50,7 @@ it('ParseLine', () => {
     ReferenceId: '',
     Tag: 'I'.repeat(31),
     Value: 'VALUE',
+    NoValue: false,
   });
 
   expect(ParseLine(`2 ${'I'.repeat(32)} VALUE`, 1, 1)).to.be.undefined;
