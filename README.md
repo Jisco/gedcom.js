@@ -34,14 +34,15 @@ I am aware that there are already several parsers for the gedcom format. However
 
 Just run npx ts-node src/console.ts with the wanted flags. Eg if you run "npm run demo:JSON" it will execute "ts-node src/console.ts --path 'examples/simpsons.get'" and will print out the Simpsons GEDCOM example file as JSON object in the console. With "npm run demoFile:JSON" it will do the same but prints the JSON object in a 'test.json' file.
 
-| Flag             | Description                                                                 |
-| ---------------- | --------------------------------------------------------------------------- |
-| --onlyStats      | Only print the parsing statistcs to the console                             |
-| --opt _xxx.yaml_ | Set the path to the yaml [definition file](#create-your-own-defintion-file) |
-| --out _xxx.json_ | File path to print into                                                     |
-| --path _xxx.ged_ | Set the path to the GEDCOM file                                             |
-| --silent         | Don't print anything to the console                                         |
-| --showProgress   | Print the progress during processing the file                               |
+| Flag                            | Description                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------- |
+| --onlyStats                     | Only print the parsing statistcs to the console                                              |
+| --opt _xxx.yaml_                | Set the path to the yaml [definition file](#create-your-own-defintion-file)                  |
+| --conversion-options _xxx.yaml_ | Set the path to the yaml [conversion options file](#create-your-own-conversion-options-file) |
+| --out _xxx.json_                | File path to print into                                                                      |
+| --path _xxx.ged_                | Set the path to the GEDCOM file                                                              |
+| --silent                        | Don't print anything to the console                                                          |
+| --showProgress                  | Print the progress during processing the file                                                |
 
 ##### Via Node or JS
 
@@ -125,6 +126,43 @@ parse.SaveAs(result.Object, 'test.json');
 | NotParsedLinesWithoutGEDCOMTagCount | Count of all lines that has _NOT_ been parsed because their tag is not defined in the yaml definition file |
 | IncorrectLinesCount                 | Count of all incorrect lines (no tag, too long etc pp)                                                     |
 | IncorrectLines                      | Array of object from incorrect lines. Properties: _LineNumber_, _Line_ and _Text_                          |
+
+### Create your own conversion options file
+
+#### Structure
+
+The conversion options file starts with an **Options** property. Options available are:
+
+```yaml
+Options:
+  - ReplaceIdentifiersWithUUIDs: false|true
+```
+
+If set to true, this will replace GEDCOM identifiers with standard UUIDs in the JSON.
+
+In a GEDCOM file, a unique identifier follows this pattern as standard:
+
+```
+@X1@
+```
+
+An @ symbol, followed by a letter, followed by a number, followed by an @ symbol.
+
+The identifiers are used to reference one part of a GEDCOM file with another part e.g.
+
+```
+0 INDI @I1@
+1 NAME Homer Simpson
+...
+0 FAM @F1@
+1 HUSB @I1@
+```
+
+Here, the ID for Homer is @I1@ which is used later in the family section in the Husband tag.
+
+But these identifiers are only unique within an individual GEDCOM file; another GEDCOM file may re-use these identifiers for other objects. Also, the format of these identifiers is specific to GEDCOM files.
+
+When converting to a JSON file, it's often useful to have identifiers that follow standard conventions and are unique across different instances of files. Hence the option to replace GEDCOM identifiers with standard UUIDs.
 
 ### Create your own defintion file
 

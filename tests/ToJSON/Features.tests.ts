@@ -185,4 +185,30 @@ describe('Features', () => {
       },
     });
   });
+
+  it('Ignores empty conversion options', () => {
+    let testData = `
+    0 @1@ INDI
+    1 NOTE abc
+    0 TRLR`;
+
+    let options = `
+        Definition:
+          - Tag: INDI
+            CollectAs: Persons
+            Properties:
+              - Tag: NOTE
+                Property: Note
+        `;
+
+    let conversionOptions = `
+        Options:
+        `;
+
+    expect(ParseText(testData, options, undefined, conversionOptions).Object).to.deep.equal({
+      Persons: {
+        Note: 'abc',
+      },
+    });
+  });
 });

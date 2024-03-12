@@ -26,6 +26,12 @@ describe('Mainpulate Values', () => {
 
     expect(result).to.be.deep.equal(['']);
   });
+
+  it('Replaces GEDCOM references which are UUIDs as plain UUIDs', () => {
+    let result = ManipulateValue(new TagDefinition({}), new ParsedLine(0, 0, 'TAG', '', '@00000000-0000-0000-0000-000000000000@'));
+
+    expect(result).to.be.deep.equal('00000000-0000-0000-0000-000000000000');
+  });
 });
 
 describe('AddStartWith', () => {

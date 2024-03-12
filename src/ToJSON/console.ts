@@ -12,6 +12,10 @@ export function Convert(argv: any) {
     options.SetConfigFile(argv.opt as string);
   }
 
+  if (argv['conversion-options']) {
+    options.SetConversionOptionsFile(argv['conversion-options'] as string);
+  }
+
   if (argv.showProgress) {
     options.SetProgressFunction((linesCount: number, lineNumber: number) => {
       process.stdout.write(`\rProgress: parsing line ${lineNumber} from ${linesCount}`);

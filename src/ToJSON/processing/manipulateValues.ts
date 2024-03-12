@@ -17,6 +17,9 @@ export function ManipulateValue(definition: TagDefinition, line: ParsedLine) {
   let convertTo = definition.PropertyType ?? definition.ConvertTo;
 
   if (value.match(/^(@.*@)/)) {
+    if (value.match(/@.{8}-.{4}-.{4}-.{4}-.{12}@/)) {
+      value = value.replace(/@/g, '');
+    }
     if (definition.ConvertTo instanceof ConvertToArray) {
       return ConvertStringToArray(definition.ConvertTo, value);
     }

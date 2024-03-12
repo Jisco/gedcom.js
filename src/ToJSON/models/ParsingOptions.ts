@@ -2,6 +2,7 @@ export default class ParsingOptions {
   private text?: string;
   private filePath?: string;
   private config?: string;
+  private conversionOptions?: string;
   private progressFunction?: (linesCount: number, actualLine: number) => void;
 
   SetText(text: string) {
@@ -20,6 +21,14 @@ export default class ParsingOptions {
     this.config = config;
   }
 
+  SetConversionOptionsFile(path: string) {
+    this.conversionOptions = require('fs').readFileSync(path, 'utf8');
+  }
+
+  SetConversionOptions(config: string) {
+    this.conversionOptions = config;
+  }
+
   GetText() {
     return this.text;
   }
@@ -30,6 +39,10 @@ export default class ParsingOptions {
 
   GetConfig() {
     return this.config ?? require('fs').readFileSync('options/version551.yaml', 'utf8');
+  }
+
+  GetConversionOptions() {
+    return this.conversionOptions ?? require('fs').readFileSync('options/conversion.yaml', 'utf8');
   }
 
   SetProgressFunction(func: (linesCount: number, actualLine: number) => void) {

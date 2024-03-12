@@ -30,7 +30,7 @@ export function ParseLine(line: string, lineNumber: number, lastLevel: number): 
   let refId = GetReferenceId(tagOrRef);
 
   if (refId !== undefined) {
-    if (refId.length > 23) {
+    if (refId.length > 23 && !refId.match(/.{8}-.{4}-.{4}-.{4}-.{12}/)) {
       return undefined;
     }
 
